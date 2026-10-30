@@ -1,0 +1,8 @@
+node_modules
+dist
+# original CAD sources stay local; the converted model is src/assets/turbine.glb
+model
+*.STEP
+*.STL
+*.SLDASM
+*.SLDPRT

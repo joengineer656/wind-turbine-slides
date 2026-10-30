@@ -1,0 +1,91 @@
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { margin: 0; height: 100%; background: #05060a; }
+button { font: inherit; color: inherit; cursor: pointer; }
+
+/* Obsidian: black stage, lit metal, one ice-blue accent.
+   1u = 1px on a 1920×1080 stage and scales to any screen, so type stays projector-sized. */
+.deck {
+  --u: calc(min(100vw / 1920, 100vh / 1080));
+  --bg: #05060a; --ink: #eef2f7; --dim: #8e97a6; --accent: #6fd0ff;
+  --line: rgba(238,242,247,.16); --panel: rgba(255,255,255,.06); --panel-solid: #0c0f15;
+  --display: 'Syne', sans-serif; --body: 'Hanken Grotesk', sans-serif;
+  position: fixed; inset: 0; overflow: hidden; background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: calc(var(--u) * 28); line-height: 1.4;
+}
+.deck > .bg { position: absolute; inset: 0; z-index: 0; background: radial-gradient(60% 55% at 50% 52%, #14202e 0%, #05060a 70%); }
+.deck > .scene { position: absolute !important; inset: 0; z-index: 2; }
+.deck > .scene canvas { touch-action: none; }
+
+/* the title slide's giant word sits behind the model */
+.behind { position: absolute; inset: 0; z-index: 1; display: grid; place-items: center; pointer-events: none; overflow: hidden; }
+.behind span { font: 700 calc(var(--u) * 360) / 0.9 var(--display); letter-spacing: -0.04em; white-space: nowrap; transform: translateY(-4%); color: transparent; -webkit-text-stroke: 1.5px rgba(111,208,255,.38); }
+
+/* copy */
+.slide { position: absolute; z-index: 3; pointer-events: none; animation: swap .35s ease-out both;
+  left: calc(var(--u) * 110); top: 50%; transform: translateY(-50%); width: calc(var(--u) * 800); }
+@keyframes swap { from { opacity: 0 } to { opacity: 1 } }
+.slide .title { font: 700 calc(var(--u) * 84) / 1.02 var(--display); letter-spacing: -0.02em; margin: 0 0 calc(var(--u) * 26); text-wrap: balance; }
+.slide .lead { margin: 0 0 calc(var(--u) * 34); font-size: calc(var(--u) * 34); font-weight: 500; line-height: 1.32; max-width: 24em; text-wrap: pretty; }
+.slide .byline { margin: 0; color: var(--dim); font-size: calc(var(--u) * 30); }
+.slide .points { list-style: none; margin: 0; padding: 0; display: grid; gap: calc(var(--u) * 20); font-size: calc(var(--u) * 29); color: var(--dim); max-width: 26em; }
+.slide .points strong { color: var(--ink); font-weight: 700; }
+.slide .facts { margin: 0; display: grid; gap: calc(var(--u) * 14); font-size: calc(var(--u) * 27); max-width: 26em; }
+.slide .facts div { display: grid; grid-template-columns: calc(var(--u) * 210) 1fr; gap: calc(var(--u) * 20); align-items: baseline; }
+.slide .facts dt { color: var(--dim); }
+.slide .facts dd { margin: 0; }
+
+/* title and closing slides: copy drops to the bottom-left */
+.slide[data-kind='title'], .slide[data-kind='end'] { top: auto; bottom: calc(var(--u) * 150); transform: none; width: calc(var(--u) * 900); }
+.slide[data-kind='title'] .title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }  /* the word behind the model is the visible title */
+.slide[data-kind='title'] .lead { font-size: calc(var(--u) * 44); margin-bottom: calc(var(--u) * 18); }
+.slide[data-kind='end'] .title { font-size: calc(var(--u) * 150); }
+/* exploded view: the model needs the full width, so the copy shrinks to a headline in the corner */
+.slide[data-id='explode'] { top: calc(var(--u) * 100); transform: none; width: calc(var(--u) * 860); }
+.slide[data-id='explode'] .title { font-size: calc(var(--u) * 72); }
+.slide[data-id='explode'] .lead { font-size: calc(var(--u) * 28); }
+
+/* parts strip: a column of dots, the name appears on hover or focus */
+.rail { position: absolute; z-index: 5; right: calc(var(--u) * 30); top: 50%; transform: translateY(-50%); display: grid; gap: calc(var(--u) * 4); justify-items: center; }
+.rail small { color: var(--dim); font-size: calc(var(--u) * 17); margin-bottom: calc(var(--u) * 8); }
+.rail button { all: unset; box-sizing: border-box; cursor: pointer; position: relative; width: calc(var(--u) * 40); height: calc(var(--u) * 40); display: grid; place-items: center; border-radius: 50%; }
+.rail button i { width: calc(var(--u) * 14); height: calc(var(--u) * 14); border-radius: 50%; border: 1px solid var(--line); transition: transform .15s; }
+.rail button span { position: absolute; right: calc(100% + var(--u) * 6); white-space: nowrap; padding: calc(var(--u) * 6) calc(var(--u) * 16); border-radius: 999px; background: var(--panel-solid); border: 1px solid var(--line); font-size: calc(var(--u) * 21); opacity: 0; transform: translateX(calc(var(--u) * 6)); pointer-events: none; transition: opacity .15s, transform .15s; }
+.rail button:hover span, .rail button:focus-visible span { opacity: 1; transform: none; }
+.rail button:hover i, .rail button.on i { transform: scale(1.35); }
+.rail button.on i { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rail button:focus-visible { outline: 2px solid var(--accent); }
+
+/* bottom bar */
+.hud { position: absolute; z-index: 5; left: calc(var(--u) * 40); right: calc(var(--u) * 40); bottom: calc(var(--u) * 34); display: flex; align-items: center; gap: calc(var(--u) * 28); font-size: calc(var(--u) * 20); color: var(--dim); }
+.progress { display: flex; gap: calc(var(--u) * 6); width: calc(var(--u) * 460); }
+.progress button { all: unset; cursor: pointer; flex: 1; height: calc(var(--u) * 22); position: relative; }
+.progress button::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 3px; margin-top: -1.5px; background: var(--line); transition: background .25s; }
+.progress button.done::after { background: var(--dim); }
+.progress button.on::after { background: var(--accent); height: 5px; margin-top: -2.5px; }
+.progress button:focus-visible { outline: 2px solid var(--accent); }
+.count { font-variant-numeric: tabular-nums; min-width: 4.5em; }
+.explode { margin-left: auto; display: flex; align-items: center; gap: calc(var(--u) * 14); }
+.explode input { width: calc(var(--u) * 260); accent-color: var(--accent); }
+.chip { background: transparent; border: 1px solid var(--line); color: var(--ink); padding: calc(var(--u) * 6) calc(var(--u) * 18); border-radius: 999px; font-size: calc(var(--u) * 20); }
+.chip:hover { border-color: var(--accent); }
+
+/* 3D callouts */
+.callout { position: relative; transform: translate(calc(var(--u) * 40), -50%); padding: calc(var(--u) * 6) calc(var(--u) * 14); background: var(--panel-solid); border: 1px solid var(--line); border-radius: 999px; color: var(--ink); white-space: nowrap; font: 500 calc(var(--u) * 20) / 1.25 var(--body); display: grid; }
+.callout::before { content: ''; position: absolute; right: 100%; top: 50%; width: calc(var(--u) * 40); height: 1px; background: var(--accent); }
+.callout::after { content: ''; position: absolute; right: calc(100% + var(--u) * 40 - 4px); top: calc(50% - 3.5px); width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+.callout.up { transform: translateY(calc(-100% - var(--u) * 46)); }
+.callout.down { transform: translateY(calc(var(--u) * 46)); }
+.callout.up::before, .callout.down::before { right: auto; left: 0; top: auto; width: 1px; height: calc(var(--u) * 46); }
+.callout.up::before { top: 100%; } .callout.down::before { bottom: 100%; }
+.callout.up::after, .callout.down::after { right: auto; left: -3px; }
+.callout.up::after { top: calc(100% + var(--u) * 46 - 3.5px); } .callout.down::after { top: auto; bottom: calc(100% + var(--u) * 46 - 3.5px); }
+.callout span { color: var(--dim); font-weight: 400; font-size: .85em; }
+
+.notes { position: absolute; z-index: 9; left: calc(var(--u) * 110); right: calc(var(--u) * 110); bottom: calc(var(--u) * 100); padding: calc(var(--u) * 24) calc(var(--u) * 32); background: rgba(10,10,12,.94); border: 1px solid rgba(255,255,255,.2); font-size: calc(var(--u) * 28); border-radius: calc(var(--u) * 24); }
+.notes p { margin: calc(var(--u) * 8) 0 0; }
+.overview { position: absolute; inset: 0; z-index: 10; background: rgba(0,0,0,.84); display: grid; grid-template-columns: repeat(4, 1fr); gap: calc(var(--u) * 20); padding: calc(var(--u) * 100) calc(var(--u) * 110); align-content: center; }
+.overview button { all: unset; box-sizing: border-box; cursor: pointer; padding: calc(var(--u) * 20); border: 1px solid rgba(255,255,255,.25); border-radius: calc(var(--u) * 20); color: #fff; font-size: calc(var(--u) * 26); line-height: 1.2; min-height: calc(var(--u) * 150); display: flex; flex-direction: column; gap: calc(var(--u) * 10); }
+.overview button.on, .overview button:hover { border-color: var(--accent); background: rgba(111,208,255,.1); }
+.overview small { opacity: .6; font-size: calc(var(--u) * 20); }
+
+@media (prefers-reduced-motion: reduce) { .slide { animation: none; } .deck *, .deck *::before, .deck *::after { transition: none !important; } }
