@@ -95,7 +95,7 @@ export const SLIDES: Slide[] = [
     title: 'Everything, pulled apart',
     lead: 'Drag to orbit, scroll to zoom, hover the parts list to find a component.',
     notes: 'Let the audience explore for a moment. Use the explode slider at the bottom to go back and forth.',
-    scene: { ...base, cam: { az: 24, el: 16, dist: 1.75 }, explode: 1, spin: 0.8, callouts: 'all', labels: ['blades-c', 'casing', 'shaft', 'vanes-a', 'gears', 'mounts'] },
+    scene: { ...base, cam: { az: 24, el: 16, dist: 1.75 }, explode: 1, spin: 0.8, callouts: 'all', labels: ['blades-c', 'casing', 'shaft', 'vanes-a', 'mounts'] },
   },
   {
     id: 'part-rotor', kind: 'part',
