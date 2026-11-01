@@ -1,6 +1,6 @@
 # Wind turbine: 3D slides
 
-An interactive slide deck for a Machine Component presentation at BAU University. The turbine is a real CAD model that rotates, orbits and explodes part by part, inside 11 slides.
+An interactive slide deck for a Machine Component presentation at BAU University. The turbine is a real CAD model that rotates, orbits and explodes part by part, inside 14 slides.
 
 **Live:** https://joengineer656.github.io/wind-turbine-slides/
 
