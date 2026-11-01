@@ -51,8 +51,10 @@ for (const g of GROUPS) {
     .setMaterial(doc.createMaterial(g.id).setBaseColorFactor([0.7, 0.72, 0.75, 1]).setMetallicFactor(0.6).setRoughnessFactor(0.4).setDoubleSided(true))
   const mesh = doc.createMesh(g.id).addPrimitive(prim)
   scene.addChild(doc.createNode(g.id).setMesh(mesh))
+  const center = mn.map((v, a) => (v + mx[a]) / 2)
   meta[g.id] = { label: g.label, kind: g.kind, spin: g.spin, dir: g.dir, count: meshes.length,
-    tris: idx.length / 3, min: mn, max: mx, center: mn.map((v, a) => (v + mx[a]) / 2) }
+    tris: idx.length / 3, min: mn, max: mx, center,
+    axis: g.axis ?? [0, 0, 1], ratio: g.ratio ?? 1, pivot: g.pivot === 'center' ? center : [0, 0, 0] }
   console.log(g.id.padEnd(9), String(meshes.length).padStart(3), 'inst', String(idx.length / 3).padStart(6), 'tris')
 }
 const glb = await new NodeIO().writeBinary(doc)

@@ -8,7 +8,7 @@ import PARTS from '../parts.generated.json'
 import type { SceneState } from '../deck/slides'
 import type { Theme } from '../themes'
 
-type Meta = { label: string; kind: 'rotor' | 'stator' | 'drive' | 'static'; spin: boolean; dir: number[]; count: number; center: number[]; min: number[]; max: number[] }
+type Meta = { label: string; kind: 'rotor' | 'stator' | 'drive' | 'static'; spin: boolean; dir: number[]; count: number; center: number[]; min: number[]; max: number[]; axis: number[]; ratio: number; pivot: number[] }
 const META = PARTS as Record<string, Meta>
 const IDS = Object.keys(META)
 const EXPLODE_DISTANCE = 0.22
@@ -48,6 +48,10 @@ function Part({ id, geometry, theme, anim, focusRef, callout }: {
   const m = META[id]
   const outer = useRef<THREE.Group>(null!)
   const spin = useRef<THREE.Group>(null!)
+  // spin turns the part about its axis through its pivot; the mesh is offset so its geometry stays where it is
+  const axis = useMemo(() => new THREE.Vector3(...m.axis).normalize(), [m.axis])
+  const pivot = m.pivot as [number, number, number]
+  const offset = m.pivot.map(v => -v) as [number, number, number]
   const dim = useRef(0)
   const glow = useRef(0)
   const baseColor = useMemo(() => new THREE.Color(theme.colors[m.kind]), [theme, m.kind])
@@ -61,7 +65,7 @@ function Part({ id, geometry, theme, anim, focusRef, callout }: {
   useFrame((_, dt) => {
     const k = anim.current.explode * EXPLODE_DISTANCE
     outer.current.position.set(m.dir[0] * k, m.dir[1] * k, m.dir[2] * k)
-    spin.current.rotation.z = m.spin ? anim.current.angle : 0
+    spin.current.quaternion.setFromAxisAngle(axis, m.spin ? anim.current.angle * m.ratio : 0)
     const f = focusRef.current
     dim.current = THREE.MathUtils.damp(dim.current, f.length > 0 && !f.includes(id) ? 1 : 0, 6, dt)
     glow.current = THREE.MathUtils.damp(glow.current, f.includes(id) ? 1 : 0, 6, dt)
@@ -73,7 +77,7 @@ function Part({ id, geometry, theme, anim, focusRef, callout }: {
 
   return (
     <group ref={outer}>
-      <group ref={spin}><mesh geometry={geometry} material={material} /></group>
+      <group ref={spin} position={pivot}><mesh geometry={geometry} material={material} position={offset} /></group>
       {callout && (
         <Html position={m.center as [number, number, number]} zIndexRange={[20, 0]} style={{ pointerEvents: 'none' }}>
           <div className={`callout ${callout}`}><b>{m.label}</b>{m.count > 1 && <span>{m.count} pieces</span>}</div>
@@ -99,7 +103,8 @@ function Flow({ theme, on }: { theme: Theme; on: boolean }) {
     if (!ref.current.visible) return
     const t = clock.elapsedTime
     seed.forEach((p, i) => {
-      const z = ((p.z + t * 0.16 * p.s) % 1) * len + ALL_MIN[2] - PAD
+      // streaks run toward -Z (air flows the other way along the shaft)
+      const z = (1 - ((p.z + t * 0.16 * p.s) % 1)) * len + ALL_MIN[2] - PAD
       const a = p.a + (z - ALL_MIN[2]) * 3.2
       o.position.set(Math.cos(a) * p.r, Math.sin(a) * p.r, z)
       o.rotation.set(0, 0, 0)

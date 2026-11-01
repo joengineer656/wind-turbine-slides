@@ -24,6 +24,7 @@ export interface Slide {
 }
 
 const base = { explode: 0, focus: [] as string[], spin: 1.6, flow: false, callouts: 'none' as const, orbit: true }
+const GEARS = ['gear-shaft', 'gear-idler', 'gear-pinion', 'gear-bevel-pinion', 'gear-bevel']
 
 export const SLIDES: Slide[] = [
   {
@@ -88,7 +89,7 @@ export const SLIDES: Slide[] = [
       { h: 'Speed against torque', t: 'a smaller gear driven by a larger one turns faster with less torque.' },
     ],
     notes: 'Do not quote a ratio unless you have counted the teeth on your own model. Ask the audience which gear is the driver.',
-    scene: { ...base, cam: { az: 150, el: 22, dist: 0.9 }, focus: ['gears'], spin: 1.8, callouts: 'focus', orbit: false },
+    scene: { ...base, cam: { az: 150, el: 22, dist: 0.9 }, focus: GEARS, spin: 1.8, callouts: 'focus', orbit: false },
   },
   {
     id: 'explode', kind: 'text',
@@ -134,7 +135,7 @@ export const SLIDES: Slide[] = [
       ['Design concern', 'Shaft diameter, bearing support, tooth strength'],
     ],
     notes: 'Link to the course: shaft design for combined torsion and bending, then gear tooth bending and contact stress.',
-    scene: { ...base, cam: { az: 120, el: 20, dist: 1.5 }, explode: 0.6, focus: ['shaft', 'gears'], callouts: 'focus', spin: 1.6, orbit: false },
+    scene: { ...base, cam: { az: 120, el: 20, dist: 1.5 }, explode: 0.6, focus: ['shaft', ...GEARS], callouts: 'focus', spin: 1.6, orbit: false },
   },
   {
     id: 'end', kind: 'end',
